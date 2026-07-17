@@ -1,19 +1,19 @@
 package utils
 
 import (
-	"fmt"
-	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
 func ExtractIntegerParamsFromRequest(values url.Values, key string) []int64 {
 	param := values[key]
+	var result []int64
 	if param != nil && param[0] != "" {
-		var result []int64
-		for _, v := range strings.Split(param, ",") {
+		for _, v := range strings.Split(param[0], ",") {
 			v, _ := strconv.ParseInt(v, 10, 64)
 			result = append(result, v)
 		}
 	}
+	return result
 }
