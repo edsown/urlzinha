@@ -35,3 +35,7 @@ func Decode(str string) uint64 {
 	}
 	return uint64(id)
 }
+
+func saveShortUrl() error {
+	return nil
+}

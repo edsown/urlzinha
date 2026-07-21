@@ -14,13 +14,13 @@ type Handler struct {
 }
 
 type Repository interface {
-	retrieveOriginalUrlDB(ctx context.Context, db *sql.DB, id uint64) error
-	retrieveOriginalUrlCache(ctx context.Context, db *sql.DB, id uint64) error
-	saveShortUrl(ctx context.Context, db *sql.DB, url *string) error
+	RetrieveOriginalUrlDB(ctx context.Context, db *sql.DB, id uint64) error
+	RetrieveOriginalUrlCache(ctx context.Context, db *sql.DB, id uint64) error
+	SaveShortUrl(ctx context.Context, db *sql.DB, url *string) error
 }
 
 type Service interface {
-	saveShortUrl(ctx context.Context, db *sql.DB, url *string) error
+	SaveShortUrl(ctx context.Context, db *sql.DB, url *string) error
 }
 
 func NewHandler(repo Repository, db *sql.DB, svc Service) *Handler {
@@ -31,10 +31,10 @@ func NewHandler(repo Repository, db *sql.DB, svc Service) *Handler {
 	}
 }
 
-func (h *Handler) handleCreate(r http.Request, w http.ResponseWriter) error {
+func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	url := utils.GetValueFromQueryStr(r.URL.Query(), "url")
-	h.svc.saveShortUrl(ctx, h.db, url)
+	h.svc.SaveShortUrl(ctx, h.db, url)
 
 	return nil
 }
