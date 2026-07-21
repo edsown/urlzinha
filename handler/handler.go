@@ -34,7 +34,14 @@ func NewHandler(repo Repository, db *sql.DB, svc Service) *Handler {
 func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	url := utils.GetValueFromQueryStr(r.URL.Query(), "url")
+	if url == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+	//TODO: http error the right way
 	h.svc.SaveShortUrl(ctx, h.db, url)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
 	return nil
 }

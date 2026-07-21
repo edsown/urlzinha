@@ -23,8 +23,9 @@ func main() {
 	svc := service.NewService()
 	mux := http.NewServeMux()
 	creationHandler := handler.NewHandler(repo, db, svc)
-	mux.HandleFunc("GET /create", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /shorten", func(w http.ResponseWriter, r *http.Request) {
 		creationHandler.HandleCreate(w, r)
 	})
+	http.ListenAndServe(":8080", mux)
 
 }
