@@ -2,32 +2,20 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	utils "github.com/edsown/urlzinha/utils"
 	"net/http"
 )
 
 type Handler struct {
-	repo Repository
-	db   *sql.DB
-	svc  Service
+	svc Service
 }
-
-type Repository interface {
-	RetrieveOriginalUrlDB(ctx context.Context, db *sql.DB, id uint64) error
-	RetrieveOriginalUrlCache(ctx context.Context, db *sql.DB, id uint64) error
-	SaveShortUrl(ctx context.Context, db *sql.DB, url *string) error
-}
-
 type Service interface {
-	SaveShortUrl(ctx context.Context, db *sql.DB, url *string) error
+	SaveShortUrl(ctx context.Context, url *string) error
 }
 
-func NewHandler(repo Repository, db *sql.DB, svc Service) *Handler {
+func NewHandler(svc Service) *Handler {
 	return &Handler{
-		repo: repo,
-		db:   db,
-		svc:  svc,
+		svc: svc,
 	}
 }
 
@@ -39,7 +27,7 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 	//TODO: http error the right way
-	h.svc.SaveShortUrl(ctx, h.db, url)
+	h.svc.SaveShortUrl(ctx, url)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 

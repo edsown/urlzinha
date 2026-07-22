@@ -18,11 +18,12 @@ func main() {
 
 		fmt.Errorf("error with database creation %s", err)
 	}
+
 	fmt.Println("config loaded")
 	repo := repository.NewRepository(db)
-	svc := service.NewService()
+	svc := service.NewService(repo)
 	mux := http.NewServeMux()
-	creationHandler := handler.NewHandler(repo, db, svc)
+	creationHandler := handler.NewHandler(svc)
 	mux.HandleFunc("GET /shorten", func(w http.ResponseWriter, r *http.Request) {
 		creationHandler.HandleCreate(w, r)
 	})
