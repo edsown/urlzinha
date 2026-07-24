@@ -1,8 +1,6 @@
 package service
 
-import "fmt"
 import "context"
-import "github.com/edsown/urlzinha/business"
 import "github.com/edsown/urlzinha/business/repository"
 
 type Service struct {
@@ -14,7 +12,6 @@ func NewService(repo repository.Repository) *Service {
 }
 
 func (svc Service) SaveShortUrl(ctx context.Context, url *string) error {
-	business.Decode(*url)
-	fmt.Println("decoding")
+	svc.repo.SaveShortUrl(ctx, url)
 	return nil
 }

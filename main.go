@@ -13,10 +13,20 @@ import (
 
 func main() {
 
-	db, err := sql.Open("sqlite", "/app.db")
+	db, err := sql.Open("sqlite", "./app.db")
 	if err != nil {
-
 		fmt.Errorf("error with database creation %s", err)
+	}
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		fmt.Errorf("error pinging the database %w", err)
+	}
+
+	query := `CREATE TABLE IF NOT EXISTS urls ( id INTEGER PRIMARY KEY AUTOINCREMENT, original_url TEXT NOT NULL, short_url TEXT NOT NULL UNIQUE, created_at DATETIME DEFAULT CURRENT_TIMESTAMP )`
+	_, err = db.Exec(query)
+	if err != nil {
+		fmt.Errorf("error creating table %w", err)
 	}
 
 	fmt.Println("config loaded")

@@ -1,7 +1,10 @@
 package repository
 
-import "database/sql"
-import "context"
+import (
+	"context"
+	"database/sql"
+	"fmt"
+)
 
 type repository struct {
 	db *sql.DB
@@ -10,7 +13,7 @@ type repository struct {
 type Repository interface {
 	RetrieveOriginalUrlDB(ctx context.Context, db *sql.DB, id uint64) error
 	RetrieveOriginalUrlCache(ctx context.Context, db *sql.DB, id uint64) error
-	SaveShortUrl(ctx context.Context, db *sql.DB, url *string) error
+	SaveShortUrl(ctx context.Context, url *string) error
 	SaveLongUrl(ctx context.Context, db *sql.DB, url *string) (id uint64, error error)
 }
 
@@ -25,7 +28,12 @@ func (r repository) RetrieveOriginalUrlCache(ctx context.Context, db *sql.DB, id
 	return nil
 }
 
-func (r repository) SaveShortUrl(ctx context.Context, db *sql.DB, url *string) error {
+func (r repository) SaveShortUrl(ctx context.Context, url *string) error {
+	query := `INSERT INTO ulrs (original_url, short_url, created_at) values (:1, :2, SYSDATE)`
+	_, err := r.db.Exec(query, url, url)
+	if err != nil {
+		fmt.Errorf("error inserting into table %w", err)
+	}
 	return nil
 }
 

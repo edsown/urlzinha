@@ -26,7 +26,6 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusBadRequest)
 		return nil
 	}
-	//TODO: http error the right way
 	h.svc.SaveShortUrl(ctx, url)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
