@@ -6,10 +6,9 @@ const alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 
 func StripOriginalUrl(url string) (strippedUrl string) {
 	return strings.TrimPrefix(url, "http")
-} // will this be used?
-// and should it be in the hash.go file?
+}
 
-func Encode(id uint64) string {
+func Encode(id int64) string {
 	if id == 0 {
 		return "0"
 	}
@@ -28,10 +27,10 @@ func Encode(id uint64) string {
 	return string(chars)
 }
 
-func Decode(str string) uint64 {
+func Decode(str string) int64 {
 	id := 0
 	for _, char := range str {
 		id = id*62 + strings.IndexRune(alphabet, char)
 	}
-	return uint64(id)
+	return int64(id)
 }

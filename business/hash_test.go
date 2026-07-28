@@ -3,7 +3,7 @@ package business
 import "testing"
 
 func TestEncodeDecodeRoundTrip(t *testing.T) {
-	ids := []uint64{0, 1, 61, 62, 700, 999999, 18446744073709551615}
+	ids := []int64{0, 1, 61, 62, 700, 999999, 9223372036854775807}
 
 	for _, id := range ids {
 		encoded := Encode(id)

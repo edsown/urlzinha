@@ -11,7 +11,10 @@ func NewService(repo repository.Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (svc Service) SaveShortUrl(ctx context.Context, url *string) error {
-	svc.repo.SaveShortUrl(ctx, url)
-	return nil
+func (svc Service) SaveShortUrl(ctx context.Context, id int64) error {
+	return svc.repo.SaveShortUrl(ctx, id)
+}
+
+func (svc Service) SaveLongUrl(ctx context.Context, url *string) (id int64, error error) {
+	return svc.repo.SaveLongUrl(ctx, url)
 }
