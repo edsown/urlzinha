@@ -19,7 +19,6 @@ func Encode(id int64) string {
 		chars = append(chars, alphabet[remainder])
 		id = id / 62
 	}
-	// reversing the slice
 	for i, j := 0, len(chars)-1; i < j; i, j = i+1, j-1 {
 		chars[i], chars[j] = chars[j], chars[i]
 	}

@@ -1,20 +1,38 @@
 package service
 
-import "context"
-import "github.com/edsown/urlzinha/business/repository"
+import (
+	"context"
+	"database/sql"
+	"fmt"
+	"time"
 
-type Service struct {
-	repo repository.Repository
+	"github.com/edsown/urlzinha/business"
+)
+
+type Repository interface {
+	SaveUrl(ctx context.Context, tx *sql.Tx, shortUrl string, originalUrl string) error
+	BeginTx(ctx context.Context) (*sql.Tx, error)
 }
 
-func NewService(repo repository.Repository) *Service {
+type Service struct {
+	repo Repository
+}
+
+func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (svc Service) SaveShortUrl(ctx context.Context, id int64) error {
-	return svc.repo.SaveShortUrl(ctx, id)
-}
+func (svc Service) InsertUrl(ctx context.Context, url string) error {
+	shortcode := business.Encode(time.Now().UnixNano())
+	tx, err := svc.repo.BeginTx(ctx)
+	if err != nil {
+		return fmt.Errorf("error at begintx:  %w", err)
+	}
+	err = svc.repo.SaveUrl(ctx, tx, shortcode, url)
+	if err != nil {
+		tx.Rollback()
+	}
+	tx.Commit()
 
-func (svc Service) SaveLongUrl(ctx context.Context, url *string) (id int64, error error) {
-	return svc.repo.SaveLongUrl(ctx, url)
+	return nil
 }
