@@ -11,6 +11,7 @@ type Handler struct {
 }
 type Service interface {
 	InsertUrl(ctx context.Context, url string) error
+	RetrieveUrl(ctx context.Context, shortUrl string) (string, error)
 }
 
 func NewHandler(svc Service) *Handler {
@@ -34,4 +35,23 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	return nil
+}
+
+func (h *Handler) HandleRetrieve(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
+	shortUrl := utils.GetValueFromQueryStr(r.URL.Query(), "shortUrl")
+	if shortUrl == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+	originalUrl, err := h.svc.RetrieveUrl(ctx, *shortUrl)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	http.Redirect(w, r, originalUrl, http.StatusFound)
+	return nil
+
 }

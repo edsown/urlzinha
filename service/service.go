@@ -11,6 +11,7 @@ import (
 
 type Repository interface {
 	SaveUrl(ctx context.Context, tx *sql.Tx, shortUrl string, originalUrl string) error
+	RetrieveUrl(ctx context.Context, shortUrl string) (string, error)
 	BeginTx(ctx context.Context) (*sql.Tx, error)
 }
 
@@ -35,4 +36,15 @@ func (svc Service) InsertUrl(ctx context.Context, url string) error {
 	tx.Commit()
 
 	return nil
+}
+
+func (svc Service) RetrieveUrl(ctx context.Context, shortUrl string) (string, error) {
+	originalUrl, err := svc.repo.RetrieveUrl(ctx, shortUrl)
+
+	if err != nil {
+		return "", fmt.Errorf("error retrieving originalUrl: %w", err)
+
+	}
+	return originalUrl, nil
+
 }

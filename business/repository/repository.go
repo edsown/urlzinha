@@ -26,3 +26,18 @@ func (r repository) SaveUrl(ctx context.Context, tx *sql.Tx, shortUrl string, or
 func (r repository) BeginTx(ctx context.Context) (*sql.Tx, error) {
 	return r.db.BeginTx(ctx, nil)
 }
+
+func (r repository) RetrieveUrl(ctx context.Context, shortUrl string) (string, error) {
+	query := `SELECT original_url FROM urls WHERE short_url = ?`
+	var originalUrl string
+	err := r.db.QueryRowContext(ctx, query, shortUrl).Scan(&originalUrl)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("url not found for %s", shortUrl)
+		}
+		return "", fmt.Errorf("error querying for original url: %w", err)
+	}
+
+	return originalUrl, nil
+}
