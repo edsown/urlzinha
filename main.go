@@ -39,6 +39,9 @@ func main() {
 	mux.HandleFunc("GET /shorten", func(w http.ResponseWriter, r *http.Request) {
 		h.HandleCreate(w, r)
 	})
+	mux.HandleFunc("GET /{shortUrl}", func(w http.ResponseWriter, r *http.Request) {
+		h.HandleRetrieve(w, r)
+	})
 
 	log.Printf("Starting server on :%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {

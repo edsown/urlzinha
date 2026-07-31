@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/edsown/urlzinha/business"
@@ -24,6 +25,10 @@ func NewService(repo Repository) *Service {
 }
 
 func (svc Service) InsertUrl(ctx context.Context, url string) error {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+		url = "https://" + url
+	}
+
 	shortcode := business.Encode(time.Now().UnixNano())
 	tx, err := svc.repo.BeginTx(ctx)
 	if err != nil {
