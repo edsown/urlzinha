@@ -24,7 +24,7 @@ func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (svc Service) InsertUrl(ctx context.Context, url string) error {
+func (svc Service) InsertUrl(ctx context.Context, url string) (string, error) {
 	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		url = "https://" + url
 	}
@@ -32,15 +32,16 @@ func (svc Service) InsertUrl(ctx context.Context, url string) error {
 	shortcode := business.Encode(time.Now().UnixNano())
 	tx, err := svc.repo.BeginTx(ctx)
 	if err != nil {
-		return fmt.Errorf("error at begintx:  %w", err)
+		return "", fmt.Errorf("error at begintx:  %w", err)
 	}
 	err = svc.repo.SaveUrl(ctx, tx, shortcode, url)
 	if err != nil {
 		tx.Rollback()
+		return "", err
 	}
 	tx.Commit()
 
-	return nil
+	return shortcode, nil
 }
 
 func (svc Service) RetrieveUrl(ctx context.Context, shortUrl string) (string, error) {

@@ -10,7 +10,7 @@ type Handler struct {
 	svc Service
 }
 type Service interface {
-	InsertUrl(ctx context.Context, url string) error
+	InsertUrl(ctx context.Context, url string) (string, error)
 	RetrieveUrl(ctx context.Context, shortUrl string) (string, error)
 }
 
@@ -27,13 +27,14 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusBadRequest)
 		return nil
 	}
-	err := h.svc.InsertUrl(ctx, *url)
+	shortcode, err := h.svc.InsertUrl(ctx, *url)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(shortcode))
 	return nil
 }
 
