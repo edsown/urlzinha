@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -24,17 +25,23 @@ func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (svc Service) InsertUrl(ctx context.Context, url string) (string, error) {
-	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
-		url = "https://" + url
-	}
+func (svc Service) InsertUrl(ctx context.Context, originalUrl string) (string, error) {
 
+	if !strings.HasPrefix(originalUrl, "http://") && !strings.HasPrefix(originalUrl, "https://") {
+		originalUrl = "https://" + originalUrl
+	}
+	_, err := url.ParseRequestURI(originalUrl)
+	if err != nil {
+		return "", fmt.Errorf("error while Parsing the URL: %w", err)
+	}
 	shortcode := business.Encode(time.Now().UnixNano())
+	// TODO: more checks like other schemes "ftp://" etc
+
 	tx, err := svc.repo.BeginTx(ctx)
 	if err != nil {
 		return "", fmt.Errorf("error at begintx:  %w", err)
 	}
-	err = svc.repo.SaveUrl(ctx, tx, shortcode, url)
+	err = svc.repo.SaveUrl(ctx, tx, shortcode, originalUrl)
 	if err != nil {
 		tx.Rollback()
 		return "", err
